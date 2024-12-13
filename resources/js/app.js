@@ -4,16 +4,15 @@ import "../css/app.css";
 import { createApp, h } from "vue";
 import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
-
-import Main from "./Layouts/Main.vue";
+import useCart from "./Util/Cart";
 
 createInertiaApp({
-    title: (title) => `My App ${title}`,
+    title: (title) => `Login ${title}`,
     resolve: (name) => {
         const pages = import.meta.glob("./Pages/**/*.vue", { eager: true });
         let page = pages[`./Pages/${name}.vue`];
-        
-        page.default.layout = page.default.layout || Main;
+
+        // page.default.layout = page.default.layout || Main;
         return page;
     },
     setup({ el, App, props, plugin }) {
@@ -22,6 +21,7 @@ createInertiaApp({
             .use(ZiggyVue)
             .component("Head", Head)
             .component("Link", Link)
+            .provide('useCart',useCart())
             .mount(el);
     },
     progress: {

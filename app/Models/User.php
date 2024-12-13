@@ -18,7 +18,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'crew_id',
         'email',
+        'phone',
+        'status',
+        'role',
         'password',
     ];
 
@@ -43,5 +47,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function void_order(){
+        return $this->belongsTo(Void_Order::class,'crew_id','id');
     }
 }
