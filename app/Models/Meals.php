@@ -25,4 +25,8 @@ class Meals extends Model
     {
         return $this->belongsTo(Void_Order::class, 'meal_id', 'id');
     }
+
+    public function successOrderMeal(){
+        return $this->belongsTo(successOrderMeal::class,'meal_id','id');
+    }    
 }

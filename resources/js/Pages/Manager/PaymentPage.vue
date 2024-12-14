@@ -4,12 +4,17 @@ import { ArrowLeftIcon } from "@heroicons/vue/24/outline";
 import NumericKeypad from "./NumericKeypad.vue";
 import BranchManager from "../../Layouts/BranchManager.vue";
 import { Link } from "@inertiajs/vue3";
+import axios from "axios";
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 
+const $toast = useToast();
 const paymentMethod = ref("cash");
 const tenderAmount = ref(0);
 const gcashReference = ref("");
 const applyDiscount = ref(false);
 const discountPercent = 20;
+const orderType = ref("dine-in");
 
 const cart = inject("useCart");
 
@@ -35,15 +40,31 @@ const change = computed(() => {
     return Math.max(0, tender - total.value);
 });
 
-const handleSubmit = () => {
-    console.log({
-        paymentMethod: paymentMethod.value,
-        tenderAmount: tenderAmount.value,
-        gcashReference: gcashReference.value,
-        applyDiscount: applyDiscount.value,
-        total: total.value,
-        change: change.value,
-    });
+const handleSubmit = async () => {
+    try {
+        const response = await axios.post(route("pos.store"), {
+            paymentMethod: paymentMethod.value,
+            orderType: orderType.value,
+            tenderAmount: tenderAmount.value,
+            gcashReference: gcashReference.value,
+            applyDiscount: applyDiscount.value,
+            total: total.value,
+            change: change.value,
+            orders: orders,
+        });
+        if ((response.data.status = 200)) {
+            cart.clearOrders();
+            $toast.success("Payment Successfully!", {
+                duration: 2000,
+                position: "bottom-left",
+            });
+            setTimeout(() => {
+                window.location.href = "/pos"; // Navigate to /pos
+            }, 2500);
+        }
+    } catch (error) {
+        console.error("ERROR" + error.message);
+    }
 };
 </script>
 
@@ -120,6 +141,11 @@ const handleSubmit = () => {
                                             value="gcash"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500"
                                         />
+                                        <img
+                                            class="h-10 ml-2 rounded-md"
+                                            src="https://images.seeklogo.com/logo-png/38/1/gcash-logo-png_seeklogo-383190.png?v=638689904120000000"
+                                            alt=""
+                                        />
                                         <span class="ml-2">GCash</span>
                                     </label>
                                 </div>
@@ -145,7 +171,85 @@ const handleSubmit = () => {
                                     "
                                 />
                             </div>
-
+                            <!-- OrderType -->
+                            <div class="mb-6">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Order Type
+                                </label>
+                                <div class="space-y-3">
+                                    <label
+                                        class="flex items-center p-3 border rounded-lg hover:bg-gray-50"
+                                    >
+                                        <input
+                                            type="radio"
+                                            v-model="orderType"
+                                            value="dine-in"
+                                            class="h-4 w-4 text-green-600 focus:ring-green-500"
+                                        />
+                                        <span
+                                            class="ml-2 flex items-center gap-2"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="lucide text-gray-500 lucide-disc"
+                                            >
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                />
+                                                <circle cx="12" cy="12" r="2" />
+                                            </svg>
+                                            Dine - In</span
+                                        >
+                                    </label>
+                                    <label
+                                        class="flex items-center p-3 border rounded-lg hover:bg-gray-50"
+                                    >
+                                        <input
+                                            type="radio"
+                                            v-model="orderType"
+                                            value="take-out"
+                                            class="h-4 w-4 text-green-600 focus:ring-green-500"
+                                        />
+                                        <span
+                                            class="ml-2 flex items-center gap-2"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="lucide text-gray-500 lucide-shopping-bag"
+                                            >
+                                                <path
+                                                    d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"
+                                                />
+                                                <path d="M3 6h18" />
+                                                <path
+                                                    d="M16 10a4 4 0 0 1-8 0"
+                                                />
+                                            </svg>
+                                            Take Out</span
+                                        >
+                                    </label>
+                                </div>
+                            </div>
                             <!-- Discount Option -->
                             <div class="mb-6">
                                 <label
