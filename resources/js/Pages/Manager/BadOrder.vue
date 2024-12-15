@@ -179,7 +179,7 @@
                 <div
                     class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
                 >
-                    <div>
+                    <!-- <div>
                         <p class="text-sm text-gray-700">
                             Showing
                             <span class="font-medium">{{
@@ -191,7 +191,7 @@
                             <span class="font-medium">{{ totalItems }}</span>
                             results
                         </p>
-                    </div>
+                    </div> -->
                     <div>
                         <nav
                             class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
@@ -214,194 +214,28 @@
                 </div>
             </div>
 
-            <TransitionRoot appear :show="showAddModal" as="template">
-                <Dialog
-                    as="div"
-                    @close="showAddModal = false"
-                    class="relative z-10"
-                >
-                    <TransitionChild
-                        as="template"
-                        enter="duration-300 ease-out"
-                        enter-from="opacity-0"
-                        enter-to="opacity-100"
-                        leave="duration-200 ease-in"
-                        leave-from="opacity-100"
-                        leave-to="opacity-0"
-                    >
-                        <div class="fixed inset-0 bg-black bg-opacity-25" />
-                    </TransitionChild>
-
-                    <div class="fixed inset-0 overflow-y-auto">
-                        <div
-                            class="flex min-h-full items-center justify-center p-4 text-center"
-                        >
-                            <TransitionChild
-                                as="template"
-                                enter="duration-300 ease-out"
-                                enter-from="opacity-0 scale-95"
-                                enter-to="opacity-100 scale-100"
-                                leave="duration-200 ease-in"
-                                leave-from="opacity-100 scale-100"
-                                leave-to="opacity-0 scale-95"
-                            >
-                                <DialogPanel
-                                    class="w-full max-w-md transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all"
-                                >
-                                    <DialogTitle
-                                        as="h3"
-                                        class="text-lg font-medium leading-6 text-gray-900 mb-4"
-                                    >
-                                        Add Bad Order
-                                    </DialogTitle>
-
-                                    <form
-                                        @submit.prevent="handleSubmit"
-                                        class="space-y-4"
-                                    >
-                                        <!-- Invoice Number -->
-                                        <div>
-                                            <label
-                                                for="invoice"
-                                                class="block text-sm font-medium text-gray-700"
-                                            >
-                                                Invoice No.
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="invoice"
-                                                v-model="formData.invoice"
-                                                class="mt-1 block p-2 w-full border rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                required
-                                            />
-                                        </div>
-
-                                        <!-- Orders Dropdown -->
-                                        <div>
-                                            <label
-                                                for="order"
-                                                class="block text-sm font-medium text-gray-700"
-                                            >
-                                                Orders
-                                            </label>
-                                            <select
-                                                id="order"
-                                                v-model="formData.order"
-                                                class="mt-1 block w-full p-2 border rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                required
-                                            >
-                                                <option value="Maparamen">
-                                                    Maparamen
-                                                </option>
-                                                <!-- Add more menu items as needed -->
-                                            </select>
-                                        </div>
-
-                                        <!-- Price and Quantity -->
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label
-                                                    for="price"
-                                                    class="block text-sm font-medium text-gray-700"
-                                                >
-                                                    Price
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    id="price"
-                                                    v-model="formData.price"
-                                                    class="mt-1 block p-2 border w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                    readonly
-                                                />
-                                            </div>
-                                            <div>
-                                                <label
-                                                    for="quantity"
-                                                    class="block text-sm  font-medium text-gray-700"
-                                                >
-                                                    Quantity
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    id="quantity"
-                                                    v-model="formData.quantity"
-                                                    min="1"
-                                                    class="mt-1 block w-full p-2 border rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <!-- Status Dropdown -->
-                                        <div>
-                                            <label
-                                                for="status"
-                                                class="block text-sm font-medium text-gray-700"
-                                            >
-                                                Status of Bad Order
-                                            </label>
-                                            <select
-                                                id="status"
-                                                v-model="formData.status"
-                                                class="mt-1 block w-full p-2 rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                required
-                                            >
-                                                <option value="Replaced">
-                                                    Replaced
-                                                </option>
-                                                <option value="Refunded">
-                                                    Refunded
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <!-- Reason -->
-                                        <div>
-                                            <label
-                                                for="reason"
-                                                class="block text-sm font-medium text-gray-700"
-                                            >
-                                                Reason of Return
-                                            </label>
-                                            <textarea
-                                                id="reason"
-                                                v-model="formData.reason"
-                                                rows="3"
-                                                class="mt-1 p-2 border block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                                required
-                                            ></textarea>
-                                        </div>
-
-                                        <!-- Submit Button -->
-                                        <button
-                                            type="submit"
-                                            class="w-full inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                                        >
-                                            Save
-                                        </button>
-                                    </form>
-                                </DialogPanel>
-                            </TransitionChild>
-                        </div>
-                    </div>
-                </Dialog>
-            </TransitionRoot>
+            <!-- AddBadOrderModal Component -->
+            <AddBadOrderModal
+                :show-modal="showAddModal"
+                @close="showAddModal = false"
+                @submit="handleAddBadOrder"
+            />
         </div>
     </BranchManager>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import {
-    Dialog,
-    DialogPanel,
-    DialogTitle,
-    TransitionChild,
-    TransitionRoot,
-} from "@headlessui/vue";
-import BranchManager from "../../Layouts/BranchManager.vue";
 
+import BranchManager from "../../Layouts/BranchManager.vue";
+import AddBadOrderModal from "./AddBadOrderModal.vue"
 const search = ref("");
+
+const handleAddBadOrder = (formData) => {
+    console.log('Bad order added:', formData);
+    // Handle form submission logic here (e.g., send to API)
+};
+
 const showAddModal = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 10;
@@ -429,13 +263,13 @@ const orders = ref([
 ]);
 
 const formData = ref({
-  invoice: '',
-  order: 'Maparamen',
-  price: '₱ 99.00',
-  quantity: 1,
-  status: 'Replaced',
-  reason: ''
-})
+    invoice: "",
+    order: "Maparamen",
+    price: "₱ 99.00",
+    quantity: 1,
+    status: "Replaced",
+    reason: "",
+});
 
 const filteredOrders = computed(() => {
     return orders.value.filter(
@@ -448,10 +282,10 @@ const filteredOrders = computed(() => {
     );
 });
 
-const totalItems = computed(() => filteredOrders.value.length);
+const totalItems = computed(() => orders.value.length);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
-const endIndex = computed(() =>
-    Math.min(startIndex.value + itemsPerPage, totalItems.value)
-);
+// const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
+// const endIndex = computed(() =>
+//     Math.min(startIndex.value + itemsPerPage, totalItems.value)
+// );
 </script>

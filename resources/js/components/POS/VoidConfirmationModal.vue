@@ -5,11 +5,14 @@ import { ArrowDownTrayIcon } from "@heroicons/vue/24/outline";
 import axios from "axios";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
+import { usePage } from "@inertiajs/vue3";
 
 const props = defineProps({
     isOpen: Boolean,
     orderDetails: Object,
 });
+const auth = usePage().props.auth;
+
 
 const cart = inject("useCart");
 
@@ -28,29 +31,35 @@ const handleVoid = async () => {
         });
         if (response.data.status == 200) {
             cart.VoidOrder(props.orderDetails);
-            $toast.success("Item Voided Successfully", { duration: 2000,position:'bottom-left' });
+            $toast.success("Item Voided Successfully", {
+                duration: 2000,
+                position: "bottom-left",
+            });
             closeModal();
         }
     } catch (error) {
         error_passcode.value = error.response.data.message;
     }
+    // console.log(props.orderDetails)
 };
 
 const handleSaveForReview = async () => {
     // emit('saveForReview', props.orderDetails)
-    try{
-        const response = await axios.post(route('meal.save_void'),{
-            orderDetails: props.orderDetails      
-        })
-        if(response.data.status == 200){
-            cart.VoidOrder(props.orderDetails)
-            $toast.success("Item Voided Successfully", { duration: 2000,position:'bottom-left' });
+    try {
+        const response = await axios.post(route("meal.save_void"), {
+            orderDetails: props.orderDetails,
+        });
+        if (response.data.status == 200) {
+            cart.VoidOrder(props.orderDetails);
+            $toast.success("Item Voided Successfully", {
+                duration: 2000,
+                position: "bottom-left",
+            });
             closeModal();
         }
-    }catch(error){
-        console.error('Error '+error.message)
+    } catch (error) {
+        console.error("Error " + error.message);
     }
-
 };
 
 const closeModal = () => {
@@ -97,6 +106,7 @@ const closeModal = () => {
 
                     <div class="mt-6 flex flex-col space-y-3">
                         <button
+                            v-if="auth.user.role != 1"
                             @click="handleSaveForReview"
                             class="inline-flex items-center justify-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                         >

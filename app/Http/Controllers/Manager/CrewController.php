@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CrewRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CrewController extends Controller
@@ -13,12 +14,16 @@ class CrewController extends Controller
     public function index()
     {
 
-        $users = User::where('status', true)
-            ->where('role', '!=', 1)
-            ->select('id', 'name', 'phone', 'role', 'crew_id')
-            ->get();
+        if (Auth::user()->role == 1) {
+            $users = User::where('status', true)
+                ->where('role', '!=', 1)
+                ->select('id', 'name', 'phone', 'role', 'crew_id')
+                ->get();
 
-        return Inertia::render('Manager/Crew_Management', ['users' => $users]);
+            return Inertia::render('Manager/Crew_Management', ['users' => $users]);
+        }else{
+            return back();
+        }
     }
 
     public function store(CrewRequest $request)

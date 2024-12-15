@@ -27,6 +27,8 @@ class AuthController extends Controller
             $request->session()->regenerate();
             if (Auth::user()->role == 1) {
                 return redirect()->route('Manager.Dashboard');
+            } else if (Auth::user()->role == 2) {
+                return redirect()->route('Manager.Pos');
             }
         }
 

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class successOrderMeal extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'success_order_id',
         'meal_id',
@@ -17,9 +17,10 @@ class successOrderMeal extends Model
 
     public function successOrder()
     {
-        $this->hasMany(SuccessOrder::class, 'success_order_id', 'id');
+        return $this->belongsTo(SuccessOrder::class, 'success_order_id', 'id');
     }
 
+    
     public function meals()
     {
         $this->hasMany(Meals::class, 'meal_id', 'id');

@@ -32,7 +32,7 @@
                     </Link>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
-                    <NotificationsDropdown />
+                    <NotificationsDropdown v-if="props.userRole == 1" />
                     <UserMenu :user-role="user" />
                 </div>
 
@@ -111,12 +111,17 @@ const navigationLinks = computed(() => {
                 // { name: "Inventory", route: "inventory" },
                 { name: "Manage Crew", route: "Manager.Crew_manager" },
                 { name: "Bad Order", route: "Manager.BadOrder" },
+                { name: "Void Order", route: "Manager.VoidOrder" },
+
             ];
         case "Cashier":
             return [
-                ...links,
-                { name: "POS", route: "pos" },
-                { name: "Void / Bad Order", route: "void-orders" },
+                // ...links,
+                { name: "POS", route: "Manager.Pos" },
+                { name: "Void Order", route: "Manager.VoidOrder" },
+                { name: "Bad Order", route: "Manager.BadOrder" },
+
+                // { name: "Void / Bad Order", route: "void-orders" },
             ];
         case "Kitchen":
             return [...links, { name: "Orders", route: "orders" }];

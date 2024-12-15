@@ -53,8 +53,9 @@ class User extends Authenticatable
         return $this->belongsTo(Void_Order::class,'crew_id','id');
     }
 
-    public function successOrder(){
-        return $this->belongsTo(SuccessOrder::class,'crew_id','id');
+    public function successOrders()
+    {
+        return $this->hasMany(SuccessOrder::class, 'crew_id', 'id');
     }
 
 }

@@ -11,24 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('void_orders', function (Blueprint $table) {
+        Schema::create('bad_orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('meal_id');
+            $table->string('invoice_no');
             $table->unsignedBigInteger('crew_id');
+            $table->string('meal_name');
             $table->integer('quantity');
-            $table->integer('status')->default(1)->comment('1 = Voided || 2 = For Review');
+            $table->integer('price');
+            $table->string('status');
+            $table->string('return_reason');
             $table->timestamps();
 
             $table->foreign('crew_id')
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
-            
-            $table->foreign('meal_id')
-                ->references('id')
-                ->on('meals')
-                ->onDelete('cascade');
-
         });
     }
 
@@ -37,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('void__orders');
+        Schema::dropIfExists('bad_orders');
     }
 };

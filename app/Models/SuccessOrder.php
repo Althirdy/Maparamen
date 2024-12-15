@@ -21,11 +21,14 @@ class SuccessOrder extends Model
         'reference_number'
     ];
 
-    public function successOrderMeal(){
-        return $this->belongsTo(successOrderMeal::class,'success_order_id','id'); 
+    public function successOrderMeals()
+    {
+        return $this->hasMany(SuccessOrderMeal::class, 'success_order_id', 'id');
     }
 
-    public function user(){
-        return $this->hasMany(User::class,'crew_id','id');
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'crew_id', 'id');
     }
 }

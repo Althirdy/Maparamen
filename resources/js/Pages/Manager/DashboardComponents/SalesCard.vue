@@ -5,10 +5,10 @@
         <!-- Card Header with Date Picker -->
         <div class="flex justify-between items-center mb-4">
             <VueDatePicker
-            v-if="showDatePicker"
+                v-if="showDatePicker"
                 v-model="date"
                 :enable-time-picker="false"
-                :format="dateFormat"
+                :format="'yyyy-MM-dd'"
                 :placeholder="placeholder"
                 :range="isRange"
                 class="w-[75%] text-xs"
@@ -21,6 +21,7 @@
             <button
                 v-if="showPrintReport"
                 class="text-blue-500 hover:text-blue-600 text-sm"
+                @click="printReport"
             >
                 Print Report
             </button>
@@ -44,6 +45,9 @@ import { ref } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { Calendar, Coins } from "lucide-vue-next";
+import axios from "axios";
+import { format } from 'date-fns'; 
+
 
 const props = defineProps({
     title: {
@@ -70,15 +74,46 @@ const props = defineProps({
         type: String,
         default: "dd/MM/yyyy",
     },
-    showDatePicker:{
-        type:Boolean,
-        default: true
-    }
+    showDatePicker: {
+        type: Boolean,
+        default: true,
+    },
 });
 
-const date = ref(null);
+const date = ref(format(new Date(), 'yyyy-MM-dd'));
+
 
 const formatNumber = (num) => {
     return new Intl.NumberFormat("en-PH").format(num);
+};
+
+const printReport = async () => {
+    try {
+        // Format the date as 'YYYY-MM-DD' (extract date part only)
+        const selectedDate = date.value 
+            ? new Date(date.value).toISOString().split('T')[0] 
+            : new Date().toISOString().split('T')[0]; // Fallback to today's date
+
+        // Log the selected date for debugging
+        console.log("Formatted Date:", selectedDate);
+
+        // Send the formatted date to the backend
+        const response = await axios.get(route('Manager.report', { date: selectedDate }), {
+            responseType: 'blob', // Important for PDF
+        });
+
+        // Create a Blob object and open the PDF
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        window.open(fileURL);
+
+        // Optional: Directly trigger a download
+        // const link = document.createElement('a');
+        // link.href = fileURL;
+        // link.setAttribute('download', 'success_orders_report.pdf');
+        // document.body.appendChild(link);
+        // link.click();
+    } catch (error) {
+        console.error("Error generating the report:", error);
+    }
 };
 </script>

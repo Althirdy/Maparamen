@@ -14,17 +14,18 @@ class Void_Order extends Model
     protected $fillable = [
         'crew_id',
         'meal_id',
+        'quantity',
         'status'
     ];
 
     public function meals()
     {
-        return $this->hasMany(Meals::class, 'meal_id','id');
+        return $this->hasMany(Meals::class, 'id', 'meal_id');
     }
 
-    public function user(){
+    public function users(){
 
-        return $this->hasMany(User::class,'crew_id','id');
+        return $this->hasMany(User::class,'id','crew_id');
     } 
     
 }

@@ -29,8 +29,8 @@ class MealController extends Controller
                 ->get();
         } else {
             $meals = Meals::with('category:id,category')
-            ->select('id', 'meal_name', 'meal_price', 'meal_image', 'category_id')
-            ->get();
+                ->select('id', 'meal_name', 'meal_price', 'meal_image', 'category_id')
+                ->get();
         }
 
         return response()->json($meals);
@@ -47,6 +47,7 @@ class MealController extends Controller
             $void = Void_Order::create([
                 'crew_id' => $user['id'],
                 'meal_id' => $request['orderDetails']['meal_id'],
+                'quantity' => $request['orderDetails']['quantity'],
                 'status' => 2
             ]);
             if ($void) {
@@ -65,6 +66,7 @@ class MealController extends Controller
         $saveVoidItem = Void_Order::create([
             'crew_id' => $user['id'],
             'meal_id' => $request['orderDetails']['meal_id'],
+            'quantity' => $request['orderDetails']['quantity'],
             'status' => 1
         ]);
 
