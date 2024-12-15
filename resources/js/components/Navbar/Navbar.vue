@@ -112,7 +112,7 @@ const navigationLinks = computed(() => {
                 { name: "Manage Crew", route: "Manager.Crew_manager" },
                 { name: "Bad Order", route: "Manager.BadOrder" },
                 { name: "Void Order", route: "Manager.VoidOrder" },
-
+                { name: "Inventory", route: "Manager.Inventory" },
             ];
         case "Cashier":
             return [

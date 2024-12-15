@@ -3,6 +3,7 @@
 use App\Http\Controllers\Manager\CrewController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VoiBadController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::post('/destroy_crew',[CrewController::class, 'destroy'])->name('crew.destroy');
     Route::inertia('/payment','Manager/PaymentPage')->name('Manager.Payment');
     Route::get('/void_order',[VoiBadController::class,'void'])->name('Manager.VoidOrder');
+    Route::get('/Inventory', [InventoryController::class, 'inventory'])->name('Manager.Inventory');
 });
 Route::get('/daily_reports_pdf',[ReportController::class,'generateDailyREport'])->name('Manager.report');
 // Route::get('/void_items',[VoiBadController::class,'getVoidItems'])->name('Manager.GetVoid');
