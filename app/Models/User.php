@@ -58,4 +58,8 @@ class User extends Authenticatable
         return $this->hasMany(SuccessOrder::class, 'crew_id', 'id');
     }
 
+    public function bad_order(){
+        return $this->belongsTo(BadOrder::class,'crew_id','id');
+    }
+
 }

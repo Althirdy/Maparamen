@@ -12,6 +12,7 @@ class BadOrder extends Model
     protected $fillable= [
         'invoice_no',
         'crew_id',
+        'meal_id',
         'meal_name',
         'quantity',
         'price',
@@ -19,4 +20,13 @@ class BadOrder extends Model
         'return_reason'
     ];
     
+    
+    public function user(){
+        return $this->hasMany(User::class,'id','crew_id');
+    }
+
+    public function meal(){
+        return $this->hasMany(Meals::class,'meal_id','id');
+    }
+
 }

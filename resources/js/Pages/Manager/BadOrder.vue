@@ -26,7 +26,7 @@
                 </div>
 
                 <!-- Search Bar -->
-                <div class="mt-6 max-w-lg">
+                <!-- <div class="mt-6 max-w-lg">
                     <div class="relative">
                         <input
                             type="text"
@@ -51,7 +51,7 @@
                             </svg>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <!-- Table -->
@@ -70,37 +70,44 @@
                                             scope="col"
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Meal Name
+                                            Invoice No.
                                         </th>
                                         <th
                                             scope="col"
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Price
+                                            Crew Name
+                                        </th>
+
+                                        <th
+                                            scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Meal_Name
                                         </th>
                                         <th
                                             scope="col"
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Cashier Name
+                                            Quantity
                                         </th>
                                         <th
                                             scope="col"
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Status of Return
+                                            Total 
                                         </th>
                                         <th
                                             scope="col"
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Date
+                                            Status
                                         </th>
                                         <th
                                             scope="col"
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Reason of Return
+                                            Return Reason
                                         </th>
                                     </tr>
                                 </thead>
@@ -108,31 +115,42 @@
                                     class="bg-white divide-y divide-gray-200"
                                 >
                                     <tr
-                                        v-for="order in filteredOrders"
+                                        v-for="order in props.badorders"
                                         :key="order.id"
                                     >
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                         >
-                                            {{ order.mealName }}
+                                            {{ order.invoice_no }}
                                         </td>
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                         >
-                                            ₱ {{ order.price.toFixed(2) }}
+                                            {{ order.name }}
                                         </td>
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                         >
-                                            {{ order.cashierName }}
+                                            {{ order.meal_name }}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                        >
+                                            {{ order.quantity }}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                        >
+                                            P {{ order.price }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span
+                                                class="px-4 py-2 rounded-md"
                                                 :class="[
                                                     order.status === 'Refunded'
                                                         ? 'text-red-600 bg-red-100'
                                                         : 'text-green-600 bg-green-100',
-                                                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                                                    'px-2 inline-flex text-xs leading-5 font-semibold ',
                                                 ]"
                                             >
                                                 {{ order.status }}
@@ -141,12 +159,7 @@
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                         >
-                                            {{ order.date }}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                        >
-                                            {{ order.reason }}
+                                            {{ order.return_reason }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -192,7 +205,7 @@
                             results
                         </p>
                     </div> -->
-                    <div>
+                    <!-- <div>
                         <nav
                             class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
                         >
@@ -210,7 +223,7 @@
                                 {{ page }}
                             </button>
                         </nav>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -228,11 +241,18 @@
 import { ref, computed } from "vue";
 
 import BranchManager from "../../Layouts/BranchManager.vue";
-import AddBadOrderModal from "./AddBadOrderModal.vue"
+import AddBadOrderModal from "./AddBadOrderModal.vue";
 const search = ref("");
 
+const props = defineProps({
+    badorders: {
+        type: Array,
+    },
+});
+
+
 const handleAddBadOrder = (formData) => {
-    console.log('Bad order added:', formData);
+    console.log("Bad order added:", formData);
     // Handle form submission logic here (e.g., send to API)
 };
 
@@ -240,27 +260,6 @@ const showAddModal = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
-const orders = ref([
-    {
-        id: 1,
-        mealName: "Maparamen",
-        price: 99.0,
-        cashierName: "John Smith",
-        status: "Refunded",
-        date: "Nov 10 2024",
-        reason: "Overcook TBone",
-    },
-    {
-        id: 2,
-        mealName: "Maparamen",
-        price: 99.0,
-        cashierName: "Bob Jhonson",
-        status: "Replaced",
-        date: "Nov 10 2024",
-        reason: "Incorrect Meals",
-    },
-    // Add more sample data as needed
-]);
 
 const formData = ref({
     invoice: "",
@@ -272,7 +271,7 @@ const formData = ref({
 });
 
 const filteredOrders = computed(() => {
-    return orders.value.filter(
+    return props.badorders.filter(
         (order) =>
             order.mealName.toLowerCase().includes(search.value.toLowerCase()) ||
             order.cashierName
@@ -282,8 +281,8 @@ const filteredOrders = computed(() => {
     );
 });
 
-const totalItems = computed(() => orders.value.length);
-const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+// const totalItems = computed(() => orders.value.length);
+// const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
 // const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
 // const endIndex = computed(() =>
 //     Math.min(startIndex.value + itemsPerPage, totalItems.value)

@@ -57,7 +57,7 @@
                                         <div
                                             v-if="
                                                 showSuggestions &&
-                                                filteredInvoices.length > 0
+                                                invoices.length > 0
                                             "
                                             class="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto"
                                         >
@@ -71,20 +71,20 @@
                                                     class="flex justify-between items-center"
                                                 >
                                                     <span class="font-medium">{{
-                                                        invoice.number
+                                                        invoice.invoice_no
                                                     }}</span>
                                                     <span
                                                         class="text-sm text-gray-500"
                                                         >₱{{
-                                                            invoice.amount
+                                                            invoice.total_amount
                                                         }}</span
                                                     >
                                                 </div>
-                                                <div
+                                                <!-- <div
                                                     class="text-sm text-gray-500"
                                                 >
                                                     {{ invoice.date }}
-                                                </div>
+                                                </div> -->
                                             </div>
                                         </div>
                                     </div>
@@ -100,11 +100,16 @@
                                     </label>
                                     <select
                                         id="order"
-                                        v-model="formData.order"
+                                        v-model="selectedMeal_id"
                                         class="mt-1 block w-full p-2 border rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                                     >
-                                        <option value="Maparamen">
-                                            Maparamen
+                                        <option
+                                            :value="meals.meal_id"
+                                            class="p-4"
+                                            v-for="meals in Meals"
+                                            :key="meals.meal_id"
+                                        >
+                                            {{ meals.meal_name }}
                                         </option>
                                         <!-- Add more menu items as needed -->
                                     </select>
@@ -184,7 +189,7 @@
 
                                 <!-- Submit Button -->
                                 <button
-                                    type="button"
+                                    type="submit"
                                     class="w-full inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                                 >
                                     Save
@@ -199,7 +204,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import {
     Dialog,
     DialogPanel,
@@ -208,6 +213,10 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { computed } from "vue";
+import axios from "axios";
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
+const $toast = useToast();
 // Props for controlling the modal visibility and handling data
 const props = defineProps({
     showModal: {
@@ -217,80 +226,129 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close", "submit"]);
+const invoices = ref([]);
+const searchQuery = ref("");
+const showSuggestions = ref(false);
+const Meals = ref([]);
+const selectedMeal_id = ref();
+const filtered_meal = ref();
 
 // Form data state
 const formData = ref({
     invoice: "",
-    order: "",
-    price: "",
+    meal_id: null,
+    price: 0,
     quantity: 1,
     status: "Replaced",
-    reason: "",
+    reason: "N/A",
 });
 
-const submitInvoice = () => {
-    console.log(formData.value.invoice);
-};
+watch(
+    () => formData.value.quantity, // Watching the quantity property
+    (newQuantity) => {
+        // Update price based on quantity change
+        formData.value.price = filtered_meal.value[0].price * newQuantity;
+    }
+);
 
-// Method to close the modal
 const closeModal = () => {
     emit("close");
 };
 
-// Method to handle form submission
-const handleSubmit = () => {
-    emit("submit", { ...formData.value });
-    closeModal();
+const handleSubmit = async () => {
+    // console.log({ ...formData.value, invoice: searchQuery.value });
+
+    try {
+        const response = await axios.post(route("store.BadOrder"), {
+            ...formData.value,
+            invoice: searchQuery.value,
+            meal_name: filtered_meal.value[0].meal_name,
+        });
+        if (response.data) {
+            $toast.success("Bad Order Saved Successfully!", {
+                duration: 1000,
+                position: "bottom-right",
+            });
+            setTimeout(() => {
+                window.location.href = "/bad_order"; 
+            }, 500);
+        }
+    } catch (err) {
+        console.log(err.message);
+    }
+
+    // closeModal();
 };
 
-const dummyInvoices = [
-  { id: 1, number: 'INV-2024-001', amount: '1,299.00', date: 'Jan 15, 2024' },
-  { id: 2, number: 'INV-2024-002', amount: '2,499.00', date: 'Jan 14, 2024' },
-  { id: 3, number: 'INV-2024-003', amount: '899.00', date: 'Jan 13, 2024' },
-  { id: 4, number: 'INV-2024-004', amount: '3,999.00', date: 'Jan 12, 2024' },
-  { id: 5, number: 'INV-2024-005', amount: '1,799.00', date: 'Jan 11, 2024' },
-]
+const fetchInvoice = async () => {
+    try {
+        const response = await axios.get(route("Get.Invoice"));
+        invoices.value = response.data;
+    } catch (error) {
+        console.error("ERROR");
+    }
+};
 
-const searchQuery = ref('')
-const showSuggestions = ref(false)
+const fetchInvoiceInfo = async () => {
+    try {
+        const response = await axios.post(route("Get.InvoiceInfo"), {
+            invoice_no: searchQuery.value,
+        });
+        // console.log(response.data)
+        Meals.value = response.data[0].meals;
+    } catch (err) {
+        console.error("ERROR");
+    }
+};
 
-// Filter invoices based on search query
+watch(selectedMeal_id, (newMealId) => {
+    formData.value.meal_id = newMealId;
+    filtered_meal.value = Meals.value.filter((n) => n.meal_id == newMealId);
+    formData.value.price = filtered_meal.value[0].price;
+});
+
+onMounted(() => {
+    fetchInvoice();
+});
+
+watch(
+    () => searchQuery.value,
+    (n) => {
+        fetchInvoiceInfo();
+    }
+);
+
 const filteredInvoices = computed(() => {
-  if (!searchQuery.value) return dummyInvoices
-  const query = searchQuery.value.toLowerCase()
-  return dummyInvoices.filter(invoice => 
-    invoice.number.toLowerCase().includes(query) ||
-    invoice.amount.includes(query)
-  )
-})
+    if (!searchQuery.value) return invoices.value;
+    const query = searchQuery.value.toLowerCase();
+    return invoices.value.filter((invoice) =>
+        invoice.invoice_no.toLowerCase().includes(query)
+    );
+});
 
-// Handle invoice selection
 const selectInvoice = (invoice) => {
-  searchQuery.value = invoice.number
-  showSuggestions.value = false
-  // Emit selected invoice to parent component if needed
-  // emit('select-invoice', invoice)
-}
+    searchQuery.value = invoice.invoice_no;
+    showSuggestions.value = false;
+};
 
 // Handle search input
 const handleSearch = () => {
-  showSuggestions.value = true
-}
+    showSuggestions.value = true;
+};
 
 // Close suggestions when clicking outside (optional)
 const handleClickOutside = (event) => {
-  if (!event.target.closest('.relative')) {
-    showSuggestions.value = false
-  }
-}
+    if (!event.target.closest(".relative")) {
+        showSuggestions.value = false;
+    }
+};
 
 // Add click outside listener (optional)
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+    document.addEventListener("click", handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
+    document.removeEventListener("click", handleClickOutside);
+});
 </script>
