@@ -11,6 +11,7 @@ class SuccessOrder extends Model
 
     protected $fillable = [
         'invoice_no',
+        'crew_id',
         'total_amount',
         'tender',
         'change',
@@ -22,5 +23,9 @@ class SuccessOrder extends Model
 
     public function successOrderMeal(){
         return $this->belongsTo(successOrderMeal::class,'success_order_id','id'); 
+    }
+
+    public function user(){
+        return $this->hasMany(User::class,'crew_id','id');
     }
 }

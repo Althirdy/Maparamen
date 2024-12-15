@@ -12,10 +12,11 @@ class POSController extends Controller
     public function store(Request $request)
     {
         $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . rand(1000, 9999);
-
+        $user = $request->user();
         // Create SuccessOrder record
         $successOrder = SuccessOrder::create([
             'invoice_no' => $invoiceNo,
+            'crew_id'=>$user['id'],
             'total_amount' => $request['total'],
             'tender' => $request['tenderAmount'],
             'change' => $request['change'],

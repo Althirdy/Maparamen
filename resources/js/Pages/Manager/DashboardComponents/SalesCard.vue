@@ -1,10 +1,11 @@
 <template>
     <div
-        class="bg-white border-gray-300 border rounded-lg shadow-sm p-4 transition-shadow"
+        class="bg-white border-gray-300 border flex flex-col justify-end rounded-lg shadow-sm p-4 transition-shadow"
     >
         <!-- Card Header with Date Picker -->
         <div class="flex justify-between items-center mb-4">
             <VueDatePicker
+            v-if="showDatePicker"
                 v-model="date"
                 :enable-time-picker="false"
                 :format="dateFormat"
@@ -69,6 +70,10 @@ const props = defineProps({
         type: String,
         default: "dd/MM/yyyy",
     },
+    showDatePicker:{
+        type:Boolean,
+        default: true
+    }
 });
 
 const date = ref(null);

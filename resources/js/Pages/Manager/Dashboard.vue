@@ -17,12 +17,15 @@
                     <SalesCard
                         title="Monthly Sales"
                         :amount="480000"
+                        :showDatePicker="false"
                     />
                     <SalesCard
                         title="Weekly Sales"
                         :amount="50000"
                         :is-range="true"
                         placeholder="Select date range"
+                        :showDatePicker="false"
+
                     />
                     <SalesCard
                         title="Daily Sales"

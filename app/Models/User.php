@@ -52,4 +52,9 @@ class User extends Authenticatable
     public function void_order(){
         return $this->belongsTo(Void_Order::class,'crew_id','id');
     }
+
+    public function successOrder(){
+        return $this->belongsTo(SuccessOrder::class,'crew_id','id');
+    }
+
 }

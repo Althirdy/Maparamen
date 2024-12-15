@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('success_orders', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_no')->index('invoice');
+            $table->unsignedBigInteger('crew_id');
             $table->integer('total_amount');
             $table->integer('tender');
             $table->integer('change');
@@ -23,6 +24,10 @@ return new class extends Migration
             $table->string('reference_number')->nullable();
             $table->timestamps();
 
+            $table->foreign('crew_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 
