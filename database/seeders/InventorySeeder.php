@@ -89,7 +89,8 @@ class InventorySeeder extends Seeder
             ['category_id' => '3', 'ingredient_name' => 'Shoyu Sauce', 'quantity' => 13.00, 'measurement' => '(ml) milliliters', 'status' => 'Critical', 'manufactured_date' => '12/16/2024', 'expiration_date' => '12/24/2024', 'delivery_date' => '12/17/2024'],
             ['category_id' => '3', 'ingredient_name' => 'Tantanmen Sauce', 'quantity' => 10.00, 'measurement' => '(ml) milliliters', 'status' => 'Low', 'manufactured_date' => '12/16/2024', 'expiration_date' => '12/24/2024', 'delivery_date' => '12/17/2024'],
             ['category_id' => '3', 'ingredient_name' => 'Shogayaki Sauce', 'quantity' => 12.00, 'measurement' => '(ml) milliliters', 'status' => 'In stock', 'manufactured_date' => '12/16/2024', 'expiration_date' => '12/24/2024', 'delivery_date' => '12/17/2024'],
-            ['category_id' => '2', 'ingredient_name' => 'Sesame Oil', 'quantity' => 30.00, 'measurement' => '(ml) milliliters', 'status' => 'In stock', 'manufactured_date' => '12/16/2024', 'expiration_date' => '12/24/2024', 'delivery_date' => '12/17/2024']
+            ['category_id' => '2', 'ingredient_name' => 'Sesame Oil', 'quantity' => 30.00, 'measurement' => '(ml) milliliters', 'status' => 'In stock', 'manufactured_date' => '12/16/2024', 'expiration_date' => '12/24/2024', 'delivery_date' => '12/17/2024'],
+            ['category_id' => '2', 'ingredient_name' => 'Palm Oil', 'quantity' => 20.00, 'measurement' => '(ml) milliliters', 'status' => 'In stock', 'manufactured_date' => '12/16/2024', 'expiration_date' => '12/24/2024', 'delivery_date' => '12/17/2024']
         ];
         DB::table('ingredients')->insert($ingredients);
     }
