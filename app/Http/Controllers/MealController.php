@@ -21,7 +21,6 @@ class MealController extends Controller
 
     public function meals($category_id)
     {
-
         if ($category_id != 1) {
             $meals = Meals::with('category:id,category')
                 ->select('id', 'meal_name', 'meal_price', 'meal_image', 'category_id')
