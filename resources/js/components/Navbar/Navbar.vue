@@ -108,11 +108,10 @@ const navigationLinks = computed(() => {
             return [
                 { name: "Dashboard", route: "Manager.Dashboard" },
                 { name: "POS", route: "Manager.Pos" },
-                // { name: "Inventory", route: "inventory" },
+                { name: "Inventory", route: "inventory.ingredients" },
                 { name: "Manage Crew", route: "Manager.Crew_manager" },
                 { name: "Bad Order", route: "Manager.BadOrder" },
                 { name: "Void Order", route: "Manager.VoidOrder" },
-
             ];
         case "Cashier":
             return [
@@ -120,6 +119,7 @@ const navigationLinks = computed(() => {
                 { name: "POS", route: "Manager.Pos" },
                 { name: "Void Order", route: "Manager.VoidOrder" },
                 { name: "Bad Order", route: "Manager.BadOrder" },
+                { name: "Inventory", route: "inventory.ingredients" },
 
                 // { name: "Void / Bad Order", route: "void-orders" },
             ];

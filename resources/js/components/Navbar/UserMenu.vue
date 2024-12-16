@@ -18,6 +18,14 @@
             >
                 <div class="py-1">
                     <Link
+                        :href="route('profile')"
+                        method="get"
+                        as="button"
+                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                        Profile
+                    </Link>
+                    <Link
                         :href="route('logout')"
                         method="post"
                         as="button"

@@ -7,7 +7,7 @@ import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import useCart from "./Util/Cart";
 
 createInertiaApp({
-    title: (title) => `Login ${title}`,
+    title: (title) => `Maparamen ${title}`,
     resolve: (name) => {
         const pages = import.meta.glob("./Pages/**/*.vue", { eager: true });
         let page = pages[`./Pages/${name}.vue`];

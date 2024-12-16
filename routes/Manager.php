@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\Manager\CrewController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VoiBadController;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'nocache'])->group(function () {
     Route::get('/',[ReportController::class,'ManagerDashboard'])->name('Manager.Dashboard');
     Route::inertia('/pos', 'Manager/Pos')->name('Manager.Pos');
+    Route::inertia('/profile','Manager/Profile')->name('profile');
     Route::get('/bad_order', [VoiBadController::class, 'index'])->name('Manager.BadOrder');
     Route::get('/manage_crew', [CrewController::class, 'index'])->name('Manager.Crew_manager');
     Route::post('/manage_crew', [CrewController::class, 'store'])->name('crew.store');
@@ -20,6 +22,6 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::get('/get_invoice',[VoiBadController::class, 'GetInvoice'])->name('Get.Invoice');
     Route::post('/getInvoiceInfo',[VoiBadController::class,'getInvoiceInfo'])->name('Get.InvoiceInfo');
     Route::post('/store_bad_order',[VoiBadController::class,'storeBadOrder'])->name('store.BadOrder');
-
+    Route::get('/inventory/{category_id?}/{searchQuery?}',[InventoryController::class,'ingredients'])->name('inventory.ingredients');
 });
 Route::get('/daily_reports_pdf',[ReportController::class,'generateDailyREport'])->name('Manager.report');

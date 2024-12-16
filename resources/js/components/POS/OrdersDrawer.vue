@@ -20,7 +20,6 @@ const cart = inject("useCart");
 const props = defineProps({
     isOpen: Boolean,
 });
-console.log(cart.orders);
 
 const emit = defineEmits(["update:isOpen"]);
 
