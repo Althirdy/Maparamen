@@ -8,8 +8,10 @@ use App\Models\Procurement;
 use App\Models\returnIngredients;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use PhpParser\Node\Stmt\Return_;
+use Svg\Tag\Rect;
 
 class InventoryController extends Controller
 {
@@ -114,6 +116,8 @@ class InventoryController extends Controller
         return response()->json($delivery);
     }
 
+
+
     public function receive_delivery(Request $request)
     {
         $delivery_id = $request['delivery_id'];
@@ -185,5 +189,72 @@ class InventoryController extends Controller
         $data = returnIngredients::orderBy('created_at', 'desc')->paginate(10);
 
         return response()->json($data);
+    }
+
+    public function update_stock(Request $request)
+    {
+        $validate = $request->validate([
+            'id' => 'required|exists:ingredients,id',
+            'quantity' => 'required|numeric|gt:0',
+            'manufactureDate' => 'required|date',
+            'expirationDate' => 'required|date|',
+            'deliveryDate' => 'required|date|',
+        ]);
+
+
+        $selected_ingredients = Ingredients::find($request['id']);
+        $selected_ingredients->quantity += $request['quantity'];
+        $selected_ingredients->manufactured_date = $request['manufactureDate'];
+        $selected_ingredients->expiration_date = $request['expirationDate'];
+        $selected_ingredients->delivery_date = $request['deliveryDate'];
+        $selected_ingredients->save();
+
+        return response()->json(['status' => 200]);
+        return response()->json($request);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'itemName' => 'required|string|max:255',
+            'quantity' => 'required|numeric|gt:0',
+            'measurement' => 'required|string|max:100',
+            'manufactureDate' => 'required|date',
+            'expirationDate' => 'required|date|after:manufactureDate',
+            'deliveryDate' => 'required|date|before:expirationDate',
+        ]);
+
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),
+            ], 422); // HTTP 422 Unprocessable Entity
+        }
+
+        $data = $request->only([
+            'itemName',
+            'quantity',
+            'measurement',
+            'category',
+            'manufactureDate',
+            'expirationDate',
+            'deliveryDate',
+        ]);
+
+        Ingredients::create([
+            'category_id' => $data['category'],
+            'ingredient_name' => $data['itemName'],
+            'quantity' => $data['quantity'],
+            'measurement' => $data['measurement'],
+            'manufactured_date' => $data['manufactureDate'],
+            'expiration_date' => $data['expirationDate'],
+            'delivery_date' => $data['deliveryDate']
+        ]);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ingredient successfully created',
+        ]);
     }
 }

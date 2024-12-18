@@ -4,6 +4,7 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { Calendar } from "lucide-vue-next";
+import axios from "axios";
 
 const props = defineProps({
     isOpen: Boolean,
@@ -17,7 +18,7 @@ const selectedMeasurement = ref("slices");
 const selectedCategory = ref(1);
 const manufactureDate = ref(null);
 const expirationDate = ref(null);
-const deliveryDate = ref(null);
+const deliveryDate = ref(new Date());
 
 const measurements = [
     "slices",
@@ -70,16 +71,33 @@ const closeModal = () => {
     resetForm();
 };
 
-const saveStock = () => {
-    emit("save", {
+const errors = ref({});
+
+const saveStock = async () => {
+    const data = {
         itemName: itemName.value,
         quantity: quantity.value,
         measurement: selectedMeasurement.value,
         category: selectedCategory.value,
-        manufactureDate: manufactureDate.value,
-        expirationDate: expirationDate.value,
-        deliveryDate: deliveryDate.value,
-    });
+        manufactureDate: convertToMMDDYYYY(manufactureDate.value),
+        expirationDate: convertToMMDDYYYY(expirationDate.value),
+        deliveryDate: convertToMMDDYYYY(deliveryDate.value),
+    };
+    try {
+        const res = await axios.post(route("inventory.store.ingredient"), {
+            ...data,
+        });
+        if (res.data) {
+            closeModal();
+            window.location.href = "/inventory";
+        }
+    } catch (err) {
+        console.error(err.response.data.errors);
+        if (err.response.data.errors) {
+            errors.value = err.response.data.errors;
+        }
+    }
+
     // resetForm();
 };
 
@@ -92,6 +110,25 @@ const resetForm = () => {
     expirationDate.value = null;
     deliveryDate.value = null;
 };
+
+const minExpirationDate = computed(() => {
+    const date = new Date(deliveryDate.value);
+    date.setDate(date.getDate() + 1); // Add one day
+    return date;
+});
+
+function convertToMMDDYYYY(dateString) {
+    // Parse the input date string
+    const date = new Date(dateString);
+
+    // Extract month, day, and year
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+
+    // Return the formatted date
+    return `${month}/${day}/${year}`;
+}
 </script>
 
 <template>
@@ -125,6 +162,11 @@ const resetForm = () => {
                                 v-model="itemName"
                                 class="mt-1 block w-full p-2 border rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             />
+                            <span
+                                v-if="errors.itemName"
+                                class="text-red-600 text-xs"
+                                >* {{ errors.itemName[0] }}</span
+                            >
                         </div>
                         <!-- Category -->
                         <div>
@@ -165,6 +207,11 @@ const resetForm = () => {
                                     min="0"
                                     class="mt-1 p-2 block w-full border rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 />
+                                <span
+                                    v-if="errors.quantity"
+                                    class="text-red-600 text-xs"
+                                    >* {{ errors.quantity[0] }}</span
+                                >
                             </div>
 
                             <!-- Measurement -->
@@ -204,9 +251,11 @@ const resetForm = () => {
                                 <VueDatePicker
                                     v-model="manufactureDate"
                                     :enable-time-picker="false"
+                                    :max-date="deliveryDate"
                                     :format="'MM/dd/yyyy'"
                                     input-class-name="dp-custom-input"
                                     :teleport="true"
+                                    auto-apply
                                 >
                                     <template #input-icon>
                                         <Calendar
@@ -214,6 +263,11 @@ const resetForm = () => {
                                         />
                                     </template>
                                 </VueDatePicker>
+                                <span
+                                    v-if="errors.manufactureDate"
+                                    class="text-red-600 text-xs"
+                                    >* {{ errors.manufactureDate[0] }}</span
+                                >
                             </div>
 
                             <!-- Expiration Date -->
@@ -227,8 +281,10 @@ const resetForm = () => {
                                     v-model="expirationDate"
                                     :enable-time-picker="false"
                                     :format="'MM/dd/yyyy'"
+                                    :min-date="minExpirationDate"
                                     input-class-name="dp-custom-input"
                                     :teleport="true"
+                                    auto-apply
                                 >
                                     <template #input-icon>
                                         <Calendar
@@ -236,6 +292,11 @@ const resetForm = () => {
                                         />
                                     </template>
                                 </VueDatePicker>
+                                <span
+                                    v-if="errors.expirationDate"
+                                    class="text-red-600 text-xs"
+                                    >* {{ errors.expirationDate[0] }}</span
+                                >
                             </div>
                         </div>
 
@@ -251,8 +312,11 @@ const resetForm = () => {
                                 v-model="deliveryDate"
                                 :enable-time-picker="false"
                                 :format="'MM/dd/yyyy'"
+                                :min-date="new Date()"
+                                :max-date="expirationDate"
                                 input-class-name="dp-custom-input"
                                 :teleport="true"
+                                auto-apply
                             >
                                 <template #input-icon>
                                     <Calendar
@@ -260,6 +324,11 @@ const resetForm = () => {
                                     />
                                 </template>
                             </VueDatePicker>
+                            <span
+                                v-if="errors.deliveryDate"
+                                class="text-red-600 text-xs"
+                                >* {{ errors.deliveryDate[0] }}</span
+                            >
                         </div>
                     </div>
 

@@ -31,5 +31,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::post('/complete_delivery',[InventoryController::class,'complete_delivery'])->name('inventory.complete.delivery');
     Route::post('/store_return',[InventoryController::class,'store_return'])->name('inventory.store.return');
     Route::get('/get_return',[InventoryController::class,'get_return'])->name('intenvory.get.return');
+    Route::post('/update_stock',[InventoryController::class,'update_stock'])->name('inventory.update.stock');
+    Route::post('/store_ingredient',[InventoryController::class,'store'])->name('inventory.store.ingredient');
 });
 Route::get('/daily_reports_pdf', [ReportController::class, 'generateDailyREport'])->name('Manager.report');

@@ -4,6 +4,11 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue";
 import { defineProps, defineEmits } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import axios from "axios";
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
+
+const $toast = useToast();
 
 const props = defineProps({
     isOpen: {
@@ -14,8 +19,6 @@ const props = defineProps({
         type: Array,
     },
 });
-
-console.log(props.selected_ingredients[0])
 
 const emit = defineEmits(["close"]);
 
@@ -28,19 +31,32 @@ const formData = ref({
     deliveryDate: props.selected_ingredients[0].delivery_date || "",
 });
 
-const handleSubmit = () => {
-    formData.value = {
-        itemName: "",
-        quantity: 0,
-        measurement: "slices",
-        manufactureDate: "",
-        expirationDate: "",
-        deliveryDate: "",
-    };
+const handleSubmit = async () => {
+    try {
+        const res = await axios.post(route("inventory.update.stock"), {
+            ...formData.value,
+            id: props.selected_ingredients[0].id,
+        });
+        if (res.data) {
+            $toast.success("Ingredient Successfully updated");
+            window.location.href = "/inventory";
+            handleClose();
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
 };
 
 const handleClose = () => {
     emit("close");
+    const formData = ref({
+        itemName: "",
+        quantity: 0,
+        measurement: "",
+        manufactureDate: "",
+        expirationDate: "",
+        deliveryDate: "",
+    });
 };
 const dateFormat = (date) => {
     if (!date) return "";
@@ -192,8 +208,13 @@ const dateFormat = (date) => {
                             Cancel
                         </button>
                         <button
+                            :disabled="formData.quantity <= 0"
                             type="submit"
                             class="flex-1 rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            :class="{
+                                'cursor-not-allowed opacity-50':
+                                    formData.quantity <= 0,
+                            }"
                         >
                             Add Stock
                         </button>

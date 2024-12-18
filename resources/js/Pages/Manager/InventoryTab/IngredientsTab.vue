@@ -258,13 +258,21 @@
         <AddIngredients
             :is-open="isModalOpen"
             @close="closeModal"
-            @save="handleSave"
         />
         <AddStock_Modal
-            v-if="auth.user.role === 3"
+            v-if="
+                auth.user.role === 3 &&
+                selected_ingredients &&
+                selected_ingredients.length > 0
+            "
             :is-open="addStockModal"
             :selected_ingredients="selected_ingredients"
-            @close="addStockModal = false"
+            @close="
+                () => {
+                    addStockModal = false;
+                    selected_ingredients = null
+                }
+            "
         />
     </div>
 </template>
@@ -298,10 +306,10 @@ const addStockModal = ref(false);
 const selected_ingredients = ref();
 
 const OpenAddStockModal = (id) => {
-    addStockModal.value = true;
     selected_ingredients.value = props.ingredients.data.filter(
         (n) => n.id === id
     );
+    addStockModal.value = true;
 };
 
 const isModalOpen = ref(false);
@@ -316,10 +324,6 @@ const closeModal = () => {
     isModalOpen.value = false;
 };
 
-const handleSave = (stockData) => {
-    console.log(stockData);
-    // closeModal();
-};
 const categories = [
     { id: 1, name: "Dry" },
     { id: 2, name: "Wet" },
