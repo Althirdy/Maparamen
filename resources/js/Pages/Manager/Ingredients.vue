@@ -3,6 +3,8 @@ import { ref } from "vue";
 import { Head } from "@inertiajs/vue3";
 import BranchManager from "../../Layouts/BranchManager.vue";
 import IngredientsTab from "./InventoryTab/IngredientsTab.vue";
+import ProcurementTab from "./InventoryTab/ProcurementTab.vue";
+import DeliveryTab from "./InventoryTab/DeliveryTab.vue";
 
 const props = defineProps({
     ingredients: {
@@ -57,6 +59,8 @@ const tabs = [
                 :category_id="category_id"
                 :searchQuery="searchQuery"
             />
+            <ProcurementTab v-if="activeTab == 'procurement'" />
+            <DeliveryTab v-if="activeTab == 'delivery'" />
         </div>
     </BranchManager>
 </template>

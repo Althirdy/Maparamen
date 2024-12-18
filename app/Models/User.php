@@ -49,8 +49,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function void_order(){
-        return $this->belongsTo(Void_Order::class,'crew_id','id');
+    public function void_order()
+    {
+        return $this->belongsTo(Void_Order::class, 'crew_id', 'id');
     }
 
     public function successOrders()
@@ -58,8 +59,13 @@ class User extends Authenticatable
         return $this->hasMany(SuccessOrder::class, 'crew_id', 'id');
     }
 
-    public function bad_order(){
-        return $this->belongsTo(BadOrder::class,'crew_id','id');
+    public function bad_order()
+    {
+        return $this->belongsTo(BadOrder::class, 'crew_id', 'id');
     }
 
+    public function delivery()
+    {
+        return $this->hasMany(Delivery::class, 'crew_id', 'id');
+    }
 }

@@ -16,5 +16,5 @@ class InventoryCategory extends Model
     public function ingredients(){
         return $this->belongsTo(Ingredients::class,'category_id','id');
     }
-
+    
 }

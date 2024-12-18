@@ -5,28 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Ingredients extends Model
+class Delivery extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'category_id',
+        'order_id',
         'ingredient_name',
+        'crew_id',
         'quantity',
         'measurement',
+        'delivery_date',
         'manufactured_date',
         'expiration_date',
-        'delivery_date'
+        'status',
     ];
 
-    public function category()
+    public function user()
     {
-
-        return $this->hasMany(InventoryCategory::class, 'id', 'category_id');
-    }
-
-    public function procurements()
-    {
-        return $this->belongsTo(Procurement::class, 'ingredient_id', 'procurement_id');
+        return $this->belongsTo(User::class, 'crew_id', 'id');
     }
 }
