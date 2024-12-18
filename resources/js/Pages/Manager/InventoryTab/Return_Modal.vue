@@ -41,10 +41,12 @@
                                     as="h3"
                                     class="text-center text-xl font-semibold leading-6 text-gray-900 mb-6"
                                 >
-                                    Order Return <br>
-                                    <span class="italic text-sm">{{ selected[0].ingredient_name }} -
-                                    {{ selected[0].quantity }}
-                                    {{ selected[0].measurement }}</span>
+                                    Order Return <br />
+                                    <span class="italic text-sm"
+                                        >{{ selected[0].ingredient_name }} -
+                                        {{ selected[0].quantity }}
+                                        {{ selected[0].measurement }}</span
+                                    >
                                 </DialogTitle>
 
                                 <!-- Form -->
@@ -70,7 +72,7 @@
                                                     <span
                                                         class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
                                                     >
-                                                        <ChevronUpDown
+                                                        <ChevronUpDownIcon
                                                             class="h-5 w-5 text-gray-400"
                                                             aria-hidden="true"
                                                         />
@@ -195,8 +197,13 @@ import {
     ListboxOptions,
     ListboxOption,
 } from "@headlessui/vue";
-import { XCircle, Check } from "lucide-vue-next";
+import { XCircle, Check, Route } from "lucide-vue-next";
+import { ChevronUpDownIcon } from "@heroicons/vue/16/solid";
+import axios from "axios";
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 
+const $toast = useToast();
 // Props
 const props = defineProps({
     isOpen: {
@@ -210,7 +217,7 @@ const props = defineProps({
 });
 
 // Emits
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "fetchReturn"]);
 
 // Return reasons
 const reasons = [
@@ -227,15 +234,47 @@ const description = ref("");
 // Methods
 const closeModal = () => {
     emit("close");
+    emit("fetchReturn");
     resetForm();
 };
 
-const handleReturn = () => {
+const handleReturn = async () => {
+    const data = {
+        delivery_id: props.selected[0].id,
+        ingredient_name: props.selected[0].ingredient_name,
+        quantity: props.selected[0].quantity,
+        measurement: props.selected[0].measurement,
+        return_date: new Date().toLocaleDateString("en-US"),
+        delivery_date: getNextTuesday(),
+        return_reason: selectedReason.value,
+        remarks: description.value,
+    };
+    try {
+        const res = await axios.post(route("inventory.store.return"), {
+            ...data,
+        });
+        if (res.data) {
+            $toast.success("Order Returned Successfully!");
+            closeModal();
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+
     // emit("submit", {
     //     reason: selectedReason.value,
     //     description: description.value,
     // });
     // resetForm();
+};
+
+const getNextTuesday = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    // Calculate days until next Tuesday. If today is Tuesday (dayOfWeek == 2), it should return next week's Tuesday.
+    const daysUntilNextTuesday = (2 - dayOfWeek + 7) % 7 || 7; // If today is Tuesday, move to next week's Tuesday
+    today.setDate(today.getDate() + daysUntilNextTuesday); // Set the date to next Tuesday
+    return today.toISOString().split("T")[0]; // Returns the date in YYYY-MM-DD format
 };
 
 const resetForm = () => {

@@ -25,4 +25,9 @@ class Delivery extends Model
     {
         return $this->belongsTo(User::class, 'crew_id', 'id');
     }
+
+    public function returnIngredients()
+    {
+        return $this->hasMany(returnIngredients::class, 'order_id', 'id');
+    }
 }

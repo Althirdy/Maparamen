@@ -124,7 +124,7 @@ const navigationLinks = computed(() => {
                 // { name: "Void / Bad Order", route: "void-orders" },
             ];
         case "Kitchen":
-            return [...links, { name: "Orders", route: "orders" }];
+            return [{ name: "Inventory", route: "inventory.ingredients" }];
         default:
             return links;
     }

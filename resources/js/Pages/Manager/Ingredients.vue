@@ -5,6 +5,7 @@ import BranchManager from "../../Layouts/BranchManager.vue";
 import IngredientsTab from "./InventoryTab/IngredientsTab.vue";
 import ProcurementTab from "./InventoryTab/ProcurementTab.vue";
 import DeliveryTab from "./InventoryTab/DeliveryTab.vue";
+import ReturnTab from "./InventoryTab/ReturnTab.vue";
 
 const props = defineProps({
     ingredients: {
@@ -22,7 +23,6 @@ const props = defineProps({
 const activeTab = ref("ingredients");
 const tabs = [
     { id: "ingredients", name: "Ingredients" },
-    { id: "meals", name: "Meals" },
     { id: "procurement", name: "Procurement (Orders)" },
     { id: "delivery", name: "Delivery" },
     { id: "return", name: "Return" },
@@ -61,6 +61,7 @@ const tabs = [
             />
             <ProcurementTab v-if="activeTab == 'procurement'" />
             <DeliveryTab v-if="activeTab == 'delivery'" />
+            <ReturnTab v-if="activeTab === 'return'" />
         </div>
     </BranchManager>
 </template>

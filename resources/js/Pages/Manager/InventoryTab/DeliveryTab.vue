@@ -16,7 +16,62 @@
                 </div>
             </div>
 
-            <!-- Add Item Button -->
+            <Listbox v-model="selected_category">
+                <div class="relative w-full sm:w-48">
+                    <ListboxButton
+                        class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
+                    >
+                        <span class="block truncate">
+                            {{ selected_category || "All" }}
+                        </span>
+                        <span
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+                        >
+                            <ChevronUpDownIcon
+                                class="h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                        </span>
+                    </ListboxButton>
+                    <transition
+                        leave-active-class="transition ease-in duration-100"
+                        leave-from-class="opacity-100"
+                        leave-to-class="opacity-0"
+                    >
+                        <ListboxOptions
+                            class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                        >
+                            <ListboxOption
+                                v-for="category in categories"
+                                :key="category.id"
+                                :value="category.id"
+                                as="template"
+                                v-slot="{ active, selected }"
+                            >
+                                <li
+                                    :class="[
+                                        active
+                                            ? 'text-white bg-indigo-600'
+                                            : 'text-gray-900',
+                                        'relative cursor-default select-none py-2 pl-3 pr-9',
+                                    ]"
+                                >
+                                    <span
+                                        :class="[
+                                            selected
+                                                ? 'font-semibold'
+                                                : 'font-normal',
+                                            'block truncate',
+                                        ]"
+                                    >
+                                        {{ category.name }}
+                                    </span>
+                                </li>
+                            </ListboxOption>
+                        </ListboxOptions>
+                    </transition>
+                </div>
+            </Listbox>
         </div>
 
         <!-- Table -->
@@ -81,6 +136,12 @@
                             <tr
                                 v-for="item in delivery_data.data"
                                 :key="item.id"
+                                @click="
+                                    auth.user.role === 3
+                                        ? openAddStockModal
+                                        : null
+                                "
+                               
                             >
                                 <td
                                     class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900"
@@ -109,7 +170,15 @@
                                     {{ formatDate(item.delivery_date) }}
                                 </td>
                                 <td
-                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                    class="whitespace-nowrap px-3 py-4 text-sm"
+                                    :class="{
+                                        'text-yellow-800':
+                                            item.status === 'To Review',
+                                        'text-green-600':
+                                            item.status === 'Completed',
+                                        'text-red-600':
+                                            item.status === 'Returned',
+                                    }"
                                 >
                                     {{ item.status }}
                                 </td>
@@ -124,27 +193,36 @@
                                     </p>
                                 </td>
                                 <td
-                                    v-if="auth.user.role == 1"
                                     class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                                 >
                                     <button
-                                        v-if="item.status == 'To Receive'"
+                                        v-if="
+                                            item.status == 'To Receive' ||
+                                            (item.status == 'Returned' &&
+                                                (auth.user.role == 2 ||
+                                                    auth.user.role == 1))
+                                        "
                                         class="bg-blue-600 px-3 py-1.5 flex gap-1 items-center rounded-md text-white"
                                         @click="Receive(item.id)"
                                     >
-                                        Recieve <Check :size="16" />
+                                        Receive <Check :size="16" />
                                     </button>
                                     <div
                                         v-if="item.status == 'To Review'"
                                         class="flex gap-2"
                                     >
                                         <button
+                                            v-if="auth.user.role === 1"
                                             class="border border-green-600 px-2.5 py-1.5 flex gap-1 items-center rounded-md text-gray-900"
                                             @click="handleReturnModal(item.id)"
                                         >
                                             Return
                                         </button>
                                         <button
+                                            v-if="
+                                                auth.user.role === 1 ||
+                                                auth.user.role === 3
+                                            "
                                             @click="
                                                 handleCompleteModal(item.id)
                                             "
@@ -214,16 +292,36 @@
             :selected="selected_delivery"
             @close="showReturnModal = false"
         />
+        <AddStockModal
+            v-if="auth.user.role === 3"
+            :is-open="addStockModal"
+            @close="addStockModal = false"
+        />
     </div>
 </template>
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import axios from "axios";
 import { Check } from "lucide-vue-next";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import Complete_Modal from "./Complete_Modal.vue";
 import Return_Modal from "./Return_Modal.vue";
+import {
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+} from "@headlessui/vue";
+import { ChevronUpDownIcon } from "@heroicons/vue/20/solid";
 
+const categories = [
+    { id: null, name: "All" },
+    { id: "Completed", name: "Completed" },
+    { id: "To Receive", name: "To Receive" },
+    { id: "Returned", name: "Returned" },
+];
+
+const selected_category = ref(0);
 const searchQuery = ref("");
 const delivery_data = ref([]);
 const auth = usePage().props.auth;
@@ -240,12 +338,25 @@ const handleCompleteModal = (id) => {
 const handleReturnModal = (id) => {
     const { data } = delivery_data.value;
     selected_delivery.value = data.filter((n) => n.id === id);
-    showReturnModal.value =true
+    showReturnModal.value = true;
 };
 
 const FetchDeliver = async (url) => {
-    const link = url || route("inventory.get.delivery");
+    let link;
+    const status = selected_category.value; // Assuming you want to use the category as the status
 
+    // Determine the URL based on search query and selected category
+    if (url) {
+        link = url;
+    } else if (selected_category.value && searchQuery.value) {
+        link = `/get_delivery/${status}/${searchQuery.value}`;
+    } else if (!selected_category.value && searchQuery.value) {
+        link = `/get_delivery/${status}/${searchQuery.value}`; // Use empty string for category
+    } else if (selected_category.value && !searchQuery.value) {
+        link = `/get_delivery/${status}/`;
+    } else {
+        link = route("inventory.get.delivery"); // Default route without filters
+    }
     try {
         const response = await axios.get(link);
         delivery_data.value = response.data;
@@ -253,6 +364,11 @@ const FetchDeliver = async (url) => {
         console.log(error.message);
     }
 };
+
+watch([searchQuery, selected_category], (sQ, SC) => {
+    FetchDeliver();
+});
+
 onMounted(() => FetchDeliver());
 
 const Receive = async (id) => {

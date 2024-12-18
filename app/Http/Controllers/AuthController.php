@@ -29,6 +29,8 @@ class AuthController extends Controller
                 return redirect()->route('Manager.Dashboard');
             } else if (Auth::user()->role == 2) {
                 return redirect()->route('Manager.Pos');
+            }else if(Auth::user()->role == 3){
+                return redirect()->route('inventory.ingredients');
             }
         }
 

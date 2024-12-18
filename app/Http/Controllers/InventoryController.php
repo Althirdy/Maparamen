@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Delivery;
 use App\Models\Ingredients;
 use App\Models\Procurement;
+use App\Models\returnIngredients;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -92,9 +93,23 @@ class InventoryController extends Controller
         }
     }
 
-    public function get_delivery()
+    public function get_delivery($status = null, $query = null)
     {
-        $delivery = Delivery::with('user')->orderBy('created_at', 'desc')->paginate(10);
+        // Start the query builder with the user relationship
+        $deliveryQuery = Delivery::with('user');
+
+        // Apply the status filter if it's set
+        if ($status) {
+            $deliveryQuery->where('status', $status);
+        }
+
+        // Apply the query filter if it's set
+        if ($query) {
+            $deliveryQuery->where('ingredient_name', 'like', "%{$query}%");
+        }
+
+        // Order by creation date and paginate the results
+        $delivery = $deliveryQuery->orderBy('created_at', 'desc')->paginate(10);
 
         return response()->json($delivery);
     }
@@ -137,5 +152,38 @@ class InventoryController extends Controller
         } else {
             return response()->json(['message' => 'Delivery not found!'], 404);
         }
+    }
+
+    public function store_return(Request $request)
+    {
+        $request->validate([
+            'return_reason' => 'required|string',
+            'remarks' => 'nullable|string'
+        ]);
+
+        $return_delivery = Delivery::find($request['delivery_id']);
+        if ($return_delivery) {
+            $return_delivery->status = 'Returned';
+            $return_delivery->save();
+            $save_return_item = returnIngredients::create([
+                'order_id' => $return_delivery->id,
+                'ingredient_name' => $request['ingredient_name'],
+                'quantity' => $request['quantity'],
+                'measurement' => $request['measurement'],
+                'return_date' => $request['return_date'],
+                'delivery_date' => $request['delivery_date'],
+                'return_reason' => $request['return_reason'],
+                'remarks' => $request['remarks']
+            ]);
+            return response()->json(['status' => 200, 'message' => 'Return Successfully']);
+        }
+        return response()->json(['status' => 404, 'message' => 'Delivery not found'], 404);
+    }
+
+    public function get_return()
+    {
+        $data = returnIngredients::orderBy('created_at', 'desc')->paginate(10);
+
+        return response()->json($data);
     }
 }

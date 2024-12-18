@@ -142,7 +142,20 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            <tr v-for="item in ingredients.data" :key="item.id">
+                            <tr
+                                v-for="item in ingredients.data"
+                                :key="item.id"
+                                @click="
+                                    auth.user.role === 3
+                                        ? OpenAddStockModal(item.id)
+                                        : null
+                                "
+                                :class="
+                                    auth.user.role === 3
+                                        ? 'hover:bg-gray-100'
+                                        : ''
+                                "
+                            >
                                 <td
                                     class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900"
                                 >
@@ -247,6 +260,12 @@
             @close="closeModal"
             @save="handleSave"
         />
+        <AddStock_Modal
+            v-if="auth.user.role === 3"
+            :is-open="addStockModal"
+            :selected_ingredients="selected_ingredients"
+            @close="addStockModal = false"
+        />
     </div>
 </template>
 <script setup>
@@ -261,6 +280,7 @@ import { ChevronUpDownIcon } from "@heroicons/vue/20/solid";
 import { Link, usePage } from "@inertiajs/vue3";
 import axios from "axios";
 import AddIngredients from "./AddIngredients.vue";
+import AddStock_Modal from "./AddStock_Modal.vue";
 
 const props = defineProps({
     ingredients: {
@@ -274,6 +294,16 @@ const props = defineProps({
         require: false,
     },
 });
+const addStockModal = ref(false);
+const selected_ingredients = ref();
+
+const OpenAddStockModal = (id) => {
+    addStockModal.value = true;
+    selected_ingredients.value = props.ingredients.data.filter(
+        (n) => n.id === id
+    );
+};
+
 const isModalOpen = ref(false);
 
 const auth = usePage().props.auth;
