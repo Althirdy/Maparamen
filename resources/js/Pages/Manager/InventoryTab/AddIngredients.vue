@@ -92,7 +92,6 @@ const saveStock = async () => {
             window.location.href = "/inventory";
         }
     } catch (err) {
-        console.error(err.response.data.errors);
         if (err.response.data.errors) {
             errors.value = err.response.data.errors;
         }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\Manager\CrewController;
 use App\Http\Controllers\ReportController;
@@ -37,5 +38,8 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::post('/update_stock', [InventoryController::class, 'update_stock'])->name('inventory.update.stock');
     Route::post('/store_ingredient', [InventoryController::class, 'store'])->name('inventory.store.ingredient');
     Route::get('/Inventory_Summary/{query?}',[ReportController::class,'Inventory_Summary'])->name('report.inventory_summary');
+    Route::post('/update_info',[AuthController::class,'Update_Profile'])->name('Update_Profile');
+    Route::post('/update_password',[AuthController::class,'update_password'])->name('update_password');
+    Route::post('/inactive_crew',[AuthController::class,'inactive_crew'])->name('inactive_crew');
 });
 Route::get('/daily_reports_pdf', [ReportController::class, 'generateDailyREport'])->name('Manager.report');

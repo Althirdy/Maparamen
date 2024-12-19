@@ -19,7 +19,9 @@
         </div>
 
         <div class="flex items-center justify-between border-t pt-2">
-            <div class="text-sm text-gray-500">Role: {{ getRoleName(crew.role) }}</div>
+            <div class="text-sm text-gray-500">
+                Role: {{ getRoleName(crew.role) }}
+            </div>
             <button
                 @click="showConfirmModal = true"
                 class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
@@ -42,7 +44,11 @@ import { ref } from "vue";
 import { User2, Phone, Trash2 } from "lucide-vue-next";
 import { router } from "@inertiajs/vue3";
 import ConfirmationModal from "./ConfirmationModal.vue";
+import axios from "axios";
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 
+const $toast = useToast();
 const props = defineProps({
     crew: {
         type: Object,
@@ -65,13 +71,18 @@ function getRoleName(role) {
     }
 }
 
-const handleRemove = () => {
-    // router.delete(route("crew.destroy", props.crew.crew_id), {
-    //     preserveScroll: true,
-    //     onSuccess: () => {
-    //         // You can add a success notification here if needed
-    //     },
-    // });
+const handleRemove = async () => {
+    try {
+        const res = await axios.post(route("inactive_crew"), {
+            id: props.crew.id,
+        });
+        if (res.data) {
+            $toast.success(`${props.crew.name} is inactive`);
+            window.location.href = "/manage_crew";
+        }
+    } catch (err) {
+        console.error(err.message);
+    }
 };
 
 defineEmits(["remove"]);

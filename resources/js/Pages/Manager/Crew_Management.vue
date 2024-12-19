@@ -22,7 +22,7 @@
                 </div>
 
                 <!-- Search Bar -->
-                <div class="relative mb-6 md:w-[50%]">
+                <!-- <div class="relative mb-6 md:w-[50%]">
                     <Search
                         class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
                     />
@@ -32,7 +32,7 @@
                         placeholder="Search Crew Member..."
                         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                </div>
+                </div> -->
 
                 <!-- Crew Grid -->
                 <div
@@ -82,11 +82,5 @@ const filteredCrew = computed(() => {
     );
 });
 
-// const removeCrew = (id) => {
-//     // Call your backend API to remove the crew member
-//     // Example using Inertia:
-//     // router.delete(route("crew.destroy", id), {
-//     //     preserveScroll: true,
-//     // });
-// };
+
 </script>
