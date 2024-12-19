@@ -141,7 +141,6 @@
                                         ? openAddStockModal
                                         : null
                                 "
-                               
                             >
                                 <td
                                     class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900"
@@ -197,10 +196,10 @@
                                 >
                                     <button
                                         v-if="
-                                            item.status == 'To Receive' ||
-                                            (item.status == 'Returned' &&
-                                                (auth.user.role == 2 ||
-                                                    auth.user.role == 1))
+                                            (item.status == 'To Receive' ||
+                                                item.status == 'Returned') &&
+                                            (auth.user.role == 2 ||
+                                                auth.user.role == 1)
                                         "
                                         class="bg-blue-600 px-3 py-1.5 flex gap-1 items-center rounded-md text-white"
                                         @click="Receive(item.id)"
@@ -319,6 +318,8 @@ const categories = [
     { id: "Completed", name: "Completed" },
     { id: "To Receive", name: "To Receive" },
     { id: "Returned", name: "Returned" },
+    { id: "To Review", name: "To Review" },
+
 ];
 
 const selected_category = ref(0);

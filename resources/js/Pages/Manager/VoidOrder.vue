@@ -109,20 +109,20 @@
                                         v-for="void_order in props.void"
                                         :key="void_order.id"
                                     >
-                                        <td class="pl-6 p-4">
+                                        <td class="pl-6 p-4 text-sm text-gray-900">
                                             {{
                                                 void_order.meals[0]
                                                     ?.meal_name || "N/A"
                                             }}
                                         </td>
-                                        <td class="pl-6">
+                                        <td class="pl-6 text-gray-600">
                                             P
                                             {{
                                                 void_order.meals[0]
                                                     ?.meal_price || "N/A"
                                             }}
                                         </td>
-                                        <td class="pl-6">
+                                        <td class="pl-6 text-gray-600">
                                             P
                                             {{
                                                 void_order.meals[0]
@@ -130,7 +130,7 @@
                                                 void_order.quantity
                                             }}
                                         </td>
-                                        <td class="pl-6">
+                                        <td class="pl-6 text-gray-600">
                                             {{
                                                 void_order.users[0]?.name ||
                                                 "N/A"
@@ -169,10 +169,7 @@
                                                 To Review
                                             </p>
                                             <p
-                                                v-if="
-                                                    auth.user.role != 1 &&
-                                                    void_order.status == 2
-                                                "
+                                                v-if="void_order.status == 2"
                                                 class="text-blue-600 font-medium"
                                             >
                                                 Voided

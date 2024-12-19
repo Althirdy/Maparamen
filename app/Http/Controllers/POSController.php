@@ -531,12 +531,7 @@ class POSController extends Controller
                         'ingredient_id' => $ing['ingredient_id'],
                         'quantity' => $ing['quantity']
                     ]);
-                }
-                Procurement::create([
-                    'ingredient_id' => $ing['ingredient_id'],
-                    'quantity' => $ing['quantity']
-                ]);
-               
+                }            
             }
             // return response()->json([
             //     $flattenedMeals

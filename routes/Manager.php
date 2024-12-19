@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['auth', 'nocache'])->group(function () {
-    Route::get('/', [ReportController::class, 'ManagerDashboard'])->name('Manager.Dashboard');
+    Route::get('/', function () {
+        return redirect()->route('Manager.Dashboard');
+    });
+    Route::get('/dashboard/{daily_date?}', [ReportController::class, 'ManagerDashboard'])->name('Manager.Dashboard');
     Route::inertia('/pos', 'Manager/Pos')->name('Manager.Pos');
     Route::inertia('/profile', 'Manager/Profile')->name('profile');
     Route::get('/bad_order', [VoiBadController::class, 'index'])->name('Manager.BadOrder');
@@ -25,13 +28,14 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::post('/store_bad_order', [VoiBadController::class, 'storeBadOrder'])->name('store.BadOrder');
     Route::get('/inventory/{category_id?}/{searchQuery?}', [InventoryController::class, 'ingredients'])->name('inventory.ingredients');
     Route::get('/get_procurement/{query?}', [InventoryController::class, 'procurement'])->name('inventory.procurement');
-    Route::post('/store_delivery',[InventoryController::class,'store_delivery'])->name('inventory.store.procurement');
-    Route::get('/get_delivery/{status?}/{query?}',[InventoryController::class,'get_delivery'])->name('inventory.get.delivery');
-    Route::post('/receive_delivery',[InventoryController::class,'receive_delivery'])->name('inventory.receive.delivery');
-    Route::post('/complete_delivery',[InventoryController::class,'complete_delivery'])->name('inventory.complete.delivery');
-    Route::post('/store_return',[InventoryController::class,'store_return'])->name('inventory.store.return');
-    Route::get('/get_return',[InventoryController::class,'get_return'])->name('intenvory.get.return');
-    Route::post('/update_stock',[InventoryController::class,'update_stock'])->name('inventory.update.stock');
-    Route::post('/store_ingredient',[InventoryController::class,'store'])->name('inventory.store.ingredient');
+    Route::post('/store_delivery', [InventoryController::class, 'store_delivery'])->name('inventory.store.procurement');
+    Route::get('/get_delivery/{status?}/{query?}', [InventoryController::class, 'get_delivery'])->name('inventory.get.delivery');
+    Route::post('/receive_delivery', [InventoryController::class, 'receive_delivery'])->name('inventory.receive.delivery');
+    Route::post('/complete_delivery', [InventoryController::class, 'complete_delivery'])->name('inventory.complete.delivery');
+    Route::post('/store_return', [InventoryController::class, 'store_return'])->name('inventory.store.return');
+    Route::get('/get_return', [InventoryController::class, 'get_return'])->name('intenvory.get.return');
+    Route::post('/update_stock', [InventoryController::class, 'update_stock'])->name('inventory.update.stock');
+    Route::post('/store_ingredient', [InventoryController::class, 'store'])->name('inventory.store.ingredient');
+    Route::get('/Inventory_Summary/{query?}',[ReportController::class,'Inventory_Summary'])->name('report.inventory_summary');
 });
 Route::get('/daily_reports_pdf', [ReportController::class, 'generateDailyREport'])->name('Manager.report');

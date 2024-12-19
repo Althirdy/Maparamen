@@ -26,18 +26,18 @@ const addAmount = (amount) => {
     if (currentValue == 0) {
         newValue = amount;
     } else {
-        newValue= currentValue + amount.toString();
+        newValue = currentValue + amount.toString();
     }
-    console.log(newValue)
+    console.log(newValue);
     emit("update:value", formatNumber(newValue));
 };
 
 const RemoveLastNumber = () => {
     let newValue = props.value.toString().slice(0, -1); // Remove the last character
     if (newValue === "") {
-        newValue = 0 // If the string is empty, set it to "0"
+        newValue = 0; // If the string is empty, set it to "0"
     }
-    emit("update:value",newValue); // Emit the updated value after removing the last number
+    emit("update:value", parseInt(newValue)); // Emit the updated value after removing the last number
 };
 
 const appendDoubleZero = () => {
@@ -113,7 +113,7 @@ const formatNumber = (value) => {
             </svg>
         </button>
         <button
-            @click="$emit('update:value', '0.00')"
+            @click="$emit('update:value', 0)"
             class="p-4 text-2xl font-medium bg-red-50 text-red-700 border rounded-lg hover:bg-red-100 active:bg-red-200"
         >
             c

@@ -11,6 +11,7 @@
                 :format="'yyyy-MM-dd'"
                 :placeholder="placeholder"
                 :range="isRange"
+                auto-apply
                 class="w-[75%] text-xs"
             >
                 <template #input-icon>
@@ -41,13 +42,12 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { Calendar, Coins } from "lucide-vue-next";
 import axios from "axios";
-import { format } from 'date-fns'; 
-
+import { format } from "date-fns";
 
 const props = defineProps({
     title: {
@@ -78,29 +78,40 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    daily_date: {
+        type: String,
+        required: false
+    }
 });
 
-const date = ref(format(new Date(), 'yyyy-MM-dd'));
+const date = ref(props.daily_date || format(new Date(), "yyyy-MM-dd"));
 
+const emits = defineEmits(["select_date"]);
 
 const formatNumber = (num) => {
     return new Intl.NumberFormat("en-PH").format(num);
 };
 
+watch(date, (newDate) => {
+    emits("select_date", newDate);
+});
 const printReport = async () => {
     try {
         // Format the date as 'YYYY-MM-DD' (extract date part only)
-        const selectedDate = date.value 
-            ? new Date(date.value).toISOString().split('T')[0] 
-            : new Date().toISOString().split('T')[0]; // Fallback to today's date
+        const selectedDate = date.value
+            ? new Date(date.value).toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0]; // Fallback to today's date
 
         // Log the selected date for debugging
         console.log("Formatted Date:", selectedDate);
 
         // Send the formatted date to the backend
-        const response = await axios.get(route('Manager.report', { date: selectedDate }), {
-            responseType: 'blob', // Important for PDF
-        });
+        const response = await axios.get(
+            route("Manager.report", { date: selectedDate }),
+            {
+                responseType: "blob", // Important for PDF
+            }
+        );
 
         // Create a Blob object and open the PDF
         const fileURL = window.URL.createObjectURL(new Blob([response.data]));

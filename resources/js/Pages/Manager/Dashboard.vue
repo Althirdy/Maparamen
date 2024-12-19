@@ -16,23 +16,23 @@
                 >
                     <SalesCard
                         title="Monthly Sales"
-                        :amount="480000"
+                        :amount="monthlySales"
                         :showDatePicker="false"
                     />
                     <SalesCard
                         title="Weekly Sales"
-                        :amount="50000"
+                        :amount="weeklySales"
                         :is-range="true"
                         placeholder="Select date range"
                         :showDatePicker="false"
-
                     />
                     <SalesCard
                         title="Daily Sales"
-                        :amount="2000"
+                        :amount="daily"
                         placeholder="Today"
                         :show-print-report="true"
-
+                        @select_date="select_date"
+                        :daily_date="daily_date"
                     />
                 </div>
 
@@ -57,4 +57,20 @@ import BranchManager from "../../Layouts/BranchManager.vue";
 import SalesCard from "./DashboardComponents/SalesCard.vue";
 import InventoryTable from "./DashboardComponents/InventoryTable.vue";
 import ActiveCrew from "./DashboardComponents/ActiveCrew.vue";
+import { ref } from "vue";
+
+const props = defineProps({
+    monthlySales: Number,
+    weeklySales: Number,
+    dailySales: Number,
+    daily_date: String,
+});
+
+const daily = ref(props.dailySales);
+const select_date = (date) => {
+    const formattedDate = new Date(date).toISOString().split("T")[0];
+    if (date) {
+        window.location.href = `/dashboard/${formattedDate}`;
+    }
+};
 </script>

@@ -34,10 +34,11 @@ const openVoidModal = (order) => {
 
 const updateQuantity = (order, delta) => {
     const newQuantity = Math.max(0, order.quantity + delta);
-    if (newQuantity === 0) {
-        orders.value = orders.value.filter((o) => o.id !== order.id);
-    } else {
-        order.quantity = newQuantity;
+    if (newQuantity !== 0) {
+        // cart.orders = cart.orders.filter((o) => o.id !== order.id);
+        cart.orders = cart.orders.map((item) =>
+            item.meal_id === order.meal_id ? { ...item, quantity: newQuantity } : item
+        );
     }
 };
 
@@ -215,7 +216,9 @@ const closeDrawer = () => {
                                             <p>₱ {{ subtotal.toFixed(2) }}</p>
                                         </div>
                                         <div class="mt-6">
-                                            <Link :href="route('Manager.Payment')">
+                                            <Link
+                                                :href="route('Manager.Payment')"
+                                            >
                                                 <button
                                                     class="w-full flex items-center justify-center rounded-md border border-transparent bg-green-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-green-700"
                                                 >

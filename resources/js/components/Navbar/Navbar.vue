@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { Link } from "@inertiajs/vue3";
 import { Braces, Menu, X } from "lucide-vue-next";
 import NotificationsDropdown from "./NotificationsDropdown.vue";

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ingredients;
+use App\Models\returnIngredients;
 use App\Models\SuccessOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -13,14 +15,46 @@ use Inertia\Inertia;
 class ReportController extends Controller
 {
 
-    public function ManagerDashboard()
+    public function ManagerDashboard($daily_date = null)
     {
-
-        if (Auth::user()->role == 1) {
-            return Inertia::render('Manager/Dashboard');
-        }else{
+        if (Auth::user()->role !== 1) {
             return back();
         }
+
+        $today = Carbon::now();
+        $startOfWeek = Carbon::now()->subDays(7)->startOfDay();
+        $endOfWeek = $today->endOfDay();
+
+        $monthlySales = DB::table('success_orders')
+            ->whereMonth('created_at', $today->month)
+            ->whereYear('created_at', $today->year)
+            ->sum('total_amount');
+
+        $weeklySales = DB::table('success_orders')
+            ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+            ->sum('total_amount');
+
+        $dailyDate = $today->toDateString();  // Default to today
+
+        if ($daily_date) {
+            try {
+                $dailyDate = Carbon::parse($daily_date)->toDateString();
+            } catch (\Exception $e) {
+                return back();
+            }
+        }
+
+        // Daily sales (use the $daily_date if valid, otherwise default to today)
+        $dailySales = DB::table('success_orders')
+            ->whereDate('created_at', $dailyDate)
+            ->sum('total_amount');
+
+        return Inertia::render('Manager/Dashboard', [
+            'monthlySales' => $monthlySales,
+            'weeklySales' => $weeklySales,
+            'dailySales' => $dailySales,
+            'daily_date' => $daily_date
+        ]);
     }
 
     public function generateDailyREport(Request $request)
@@ -98,5 +132,23 @@ class ReportController extends Controller
         $pdf->setPaper('a4', 'portrait');
         return $pdf->stream('success_orders_report.pdf');
         // return response()->json($response);
+    }
+
+
+    public function Inventory_Summary($query = null)
+    {
+        if ($query) {
+            $inventory = Ingredients::where('ingredient_name', 'like', "%{$query}%")
+                ->inRandomOrder() // Randomize the results
+                ->take(5)          // Limit to 4 records
+                ->get();
+        } else {
+            // If no query, get 4 random records
+            $inventory = Ingredients::inRandomOrder()
+                ->take(5)
+                ->get();
+        }
+        
+        return response()->json($inventory);
     }
 }
