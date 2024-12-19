@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ingredients;
+use App\Models\ManagerNotification;
 use App\Models\returnIngredients;
 use App\Models\SuccessOrder;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -148,7 +150,25 @@ class ReportController extends Controller
                 ->take(5)
                 ->get();
         }
-        
+
         return response()->json($inventory);
+    }
+
+    public function active_crew()
+    {
+
+        $activeCrew = User::where('isActive', 1)
+            ->where('role', '!=', 1)  // 'role_id' is not equal to 1
+            ->get();
+
+        return response()->json($activeCrew);
+    }
+
+    public function get_notification()
+    {
+        $notification  = ManagerNotification::get();
+
+
+        return response()->json($notification);
     }
 }

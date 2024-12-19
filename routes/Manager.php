@@ -41,5 +41,7 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::post('/update_info',[AuthController::class,'Update_Profile'])->name('Update_Profile');
     Route::post('/update_password',[AuthController::class,'update_password'])->name('update_password');
     Route::post('/inactive_crew',[AuthController::class,'inactive_crew'])->name('inactive_crew');
+    Route::get('/get_active_crew',[ReportController::class,'active_crew'])->name('get_active_crew');
+    Route::get('/get_notification',[ReportController::class,'get_notification'])->name('get_notification');
 });
 Route::get('/daily_reports_pdf', [ReportController::class, 'generateDailyREport'])->name('Manager.report');

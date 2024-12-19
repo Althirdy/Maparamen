@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ManagerNotification;
 use App\Models\Procurement;
 use App\Models\SuccessOrder;
 use App\Models\successOrderMeal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -476,7 +478,7 @@ class POSController extends Controller
         $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . rand(1000, 9999);
         $user = $request->user();
         DB::beginTransaction();
-         try {
+        try {
             // Create SuccessOrder record
             $successOrder = SuccessOrder::create([
                 'invoice_no' => $invoiceNo,
@@ -519,8 +521,8 @@ class POSController extends Controller
                 }
 
                 $existingProcurement = Procurement::where('ingredient_id', $ing['ingredient_id'])
-                                   ->where('status', 1)
-                                   ->first();
+                    ->where('status', 1)
+                    ->first();
 
                 if ($existingProcurement) {
                     // Update the existing procurement record
@@ -531,13 +533,12 @@ class POSController extends Controller
                         'ingredient_id' => $ing['ingredient_id'],
                         'quantity' => $ing['quantity']
                     ]);
-                }            
+                }
             }
-            // return response()->json([
-            //     $flattenedMeals
-            // ]);
+
+
             DB::commit();
-            
+            $this->checkBestSellers($request['orders']);
             return response()->json([
                 'status' => 200,
                 'invoice_no' => $invoiceNo,
@@ -547,6 +548,55 @@ class POSController extends Controller
         } catch (\Exception $e) {
             // DB::rollBack();
             return response()->json(['error' => 'Failed to process the order.'], 500);
+        }
+    }
+
+    private function checkBestSellers($orders)
+    {
+        $temporaryArray = [];
+        $bestsellerArray = [];
+        $today = Carbon::today();
+        foreach ($orders as $order) {
+            // Filter success_order_meals for today's orders where meal_id matches
+            $mealOrdersToday = DB::table('success_order_meals')
+                ->where('meal_id', $order['meal_id'])
+                ->whereDate('created_at', $today) // Only orders created today
+                ->get();
+
+            // If we have matching meals, accumulate the quantity
+            if ($mealOrdersToday->isNotEmpty()) {
+                $totalQuantity = $mealOrdersToday->sum('quantity');
+
+                // Store the accumulated quantity in the temporary array
+                $temporaryArray[] = [
+                    'meal_id' => $order['meal_id'],
+                    'meal_name' => $order['meal_name'],
+                    'total_quantity' => $totalQuantity,
+                ];
+            }
+            foreach ($temporaryArray as $item) {
+                if ($item['total_quantity'] > 10) {
+                    $bestsellerArray[] = [
+                        'meal_name' => $item['meal_name'],
+                        'total_quantity' => $item['total_quantity'],
+                    ];
+                    ManagerNotification::create([
+                        'category' => 'Bestseller',
+                        'title' => 'BestSeller! ' . $item['meal_name'],
+                        'description' => $item['meal_name'] . ' order ' . $item['total_quantity'] . ' today',
+                    ]);
+                }
+            }
+        }
+        if (!empty($bestsellerArray)) {
+            return response()->json([
+
+                'bestSeller' => $bestsellerArray
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+            ]);
         }
     }
 }

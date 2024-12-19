@@ -7,7 +7,7 @@
             <span class="sr-only">View notifications</span>
             <Bell class="h-6 w-6" />
             <span
-                v-if="notifications.length"
+                v-if="notif_data.length"
                 class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"
             />
         </button>
@@ -32,14 +32,15 @@
 
                 <div class="max-h-96 overflow-y-auto">
                     <NotificationItem
-                        v-for="notification in notifications"
+                        v-for="notification in notif_data"
                         :key="notification.id"
                         v-bind="notification"
+                        :notification="notification"
                     />
                 </div>
 
                 <div
-                    v-if="!notifications.length"
+                    v-if="!notif_data.length"
                     class="p-4 text-center text-gray-500"
                 >
                     No new notifications
@@ -50,25 +51,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { Bell } from "lucide-vue-next";
 import NotificationItem from "./NotificationItem.vue";
+import axios from "axios";
 
 const isOpen = ref(false);
-const notifications = ref([
-    {
-        id: 1,
-        type: "trending",
-        title: "Trending Meal",
-        message: "Volcano Maki ordered 3 times in the last hour",
-        timeAgo: "1 hour ago",
-    },
-    {
-        id: 2,
-        type: "stock",
-        title: "Low Stock Alert!",
-        message: "Salmon stock below 20% threshold",
-        timeAgo: "1 hour ago",
-    },
-]);
+const notif_data = ref([]);
+
+const fetchNotif = async () => {
+    try {
+        const res = await axios.get(route("get_notification"));
+        notif_data.value = res.data;
+        console.log(notif_data.value);
+    } catch (error) {
+        console.error(error.message);
+    }
+};
+
+onMounted(() => {
+    fetchNotif();
+});
 </script>

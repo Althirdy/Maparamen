@@ -8,10 +8,9 @@
                     :class="iconColorClass"
                 />
             </div>
-            <div class="ml-3 w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900">{{ title }}</p>
-                <p class="mt-1 text-sm text-gray-500">{{ message }}</p>
-                <p class="mt-1 text-xs text-gray-400">{{ timeAgo }}</p>
+            <div class="ml-3 w-0 flex-1 flex flex-col">
+                <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
+                <p class="mt-1 text-sm text-gray-500">{{ notification.description }}</p>
             </div>
         </div>
     </div>
@@ -22,27 +21,16 @@ import { computed } from "vue";
 import { TrendingUp, Package } from "lucide-vue-next";
 
 const props = defineProps({
-    type: {
-        type: String,
-        required: true,
-    },
-    title: {
-        type: String,
-        required: true,
-    },
-    message: {
-        type: String,
-        required: true,
-    },
-    timeAgo: {
-        type: String,
+    notification: {
+        type: Object,
         required: true,
     },
 });
 
+
 const icon = computed(() => {
-    switch (props.type) {
-        case "trending":
+    switch (props.notification.category) {
+        case "Bestseller":
             return TrendingUp;
         case "stock":
             return Package;
@@ -52,8 +40,8 @@ const icon = computed(() => {
 });
 
 const iconColorClass = computed(() => {
-    switch (props.type) {
-        case "trending":
+    switch (props.notification.category) {
+        case "Bestseller":
             return "text-blue-500";
         case "stock":
             return "text-red-500";

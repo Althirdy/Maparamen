@@ -27,6 +27,9 @@ class AuthController extends Controller
         $role = $roleMapping[$fields['role']] ?? null;
 
         if (Auth::attempt(['crew_id' => $fields['crew_id'], 'password' => $fields['password'], 'role' => $role, 'status' => true])) {
+            $user = Auth::user();
+            $user->isActive = true;  // Update the isActive column
+            $user->save();
             $request->session()->regenerate();
             if (Auth::user()->role == 1) {
                 return redirect()->route('Manager.Dashboard');
