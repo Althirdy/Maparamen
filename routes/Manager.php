@@ -33,3 +33,4 @@ Route::middleware(['auth', 'nocache'])->group(function () {
     Route::get('/get_return',[InventoryController::class,'get_return'])->name('intenvory.get.return');
 });
 Route::get('/daily_reports_pdf', [ReportController::class, 'generateDailyREport'])->name('Manager.report');
+Route::get('/sales-data', [ReportController::class, 'getSalesData'])->name('sales.data');

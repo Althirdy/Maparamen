@@ -16,12 +16,12 @@
                 >
                     <SalesCard
                         title="Monthly Sales"
-                        :amount="480000"
+                        :amount="monthlyAmount"
                         :showDatePicker="false"
                     />
                     <SalesCard
                         title="Weekly Sales"
-                        :amount="50000"
+                        :amount="weeklyAmount"
                         :is-range="true"
                         placeholder="Select date range"
                         :showDatePicker="false"
@@ -29,7 +29,7 @@
                     />
                     <SalesCard
                         title="Daily Sales"
-                        :amount="2000"
+                        :amount="dailyAmount"
                         placeholder="Today"
                         :show-print-report="true"
 
@@ -57,4 +57,24 @@ import BranchManager from "../../Layouts/BranchManager.vue";
 import SalesCard from "./DashboardComponents/SalesCard.vue";
 import InventoryTable from "./DashboardComponents/InventoryTable.vue";
 import ActiveCrew from "./DashboardComponents/ActiveCrew.vue";
+import { ref, onMounted } from "vue";
+
+const monthlyAmount = ref(0);
+const weeklyAmount = ref(0);
+const dailyAmount = ref(0);
+
+const fetchSalesData = async () => {
+    try {
+        const response = await axios.get('/api/sales-data');
+        monthlyAmount.value = response.data.monthly;
+        weeklyAmount.value = response.data.weekly;
+        dailyAmount.value = response.data.daily;
+    } catch (error) {
+        console.error('Error fetching sales data:', error);
+    }
+};
+
+onMounted(() => {
+    fetchSalesData();
+});
 </script>

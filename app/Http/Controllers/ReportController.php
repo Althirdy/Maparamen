@@ -99,4 +99,35 @@ class ReportController extends Controller
         return $pdf->stream('success_orders_report.pdf');
         // return response()->json($response);
     }
+
+    public function getSalesData()
+{
+    $today = Carbon::today();
+    
+    // Daily sales
+    $dailySales = DB::table('success_orders')
+        ->whereDate('created_at', $today)
+        ->sum('total_amount');
+
+    // Weekly sales
+    $weeklySales = DB::table('success_orders')
+        ->whereBetween('created_at', [
+            $today->copy()->startOfWeek(),
+            $today->copy()->endOfWeek()
+        ])
+        ->sum('total_amount');
+
+    // Monthly sales
+    $monthlySales = DB::table('success_orders')
+        ->whereYear('created_at', $today->year)
+        ->whereMonth('created_at', $today->month)
+        ->sum('total_amount');
+
+    return response()->json([
+        'daily' => $dailySales,
+        'weekly' => $weeklySales,
+        'monthly' => $monthlySales
+    ]);
+}
+
 }
